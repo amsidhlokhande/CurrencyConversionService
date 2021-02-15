@@ -1,0 +1,69 @@
+version: "3.7"
+services:
+  mysql:
+    container_name: mysql
+    image: library/mysql:latest
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MYSQL_DATABASE: currenydb
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: currency
+      MYSQL_PASSWORD: currency
+    #command: rm -rf  var/lib/mysql
+    volumes:
+      - mysql-database-currency-volume:/var/lib/mysql
+    networks:
+      - currency-app-network
+
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin:latest
+    restart: always
+    ports:
+      - "9411:9411"
+    networks:
+      - currency-app-network
+
+  currencyexchangerateservice:
+    container_name: currencyexchangerateservice
+    image: adithilokhande/currencyexchangerateservice:0.0.1-SNAPSHOT
+    restart: always
+    ports:
+      - "8100:8100"
+    depends_on:
+      - mysql
+      - zipkin
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: currenydb
+      MYSQL_USERNAME: currency
+      MYSQL_PASSWORD: currency
+      ZIPKIN_SERVICE_NAME: zipkin
+    networks:
+      - currency-app-network
+  currencyconversionservice:
+    container_name: currencyconversionservice
+    image: adithilokhande/currencyconversionservice:0.0.1-SNAPSHOT
+    ports:
+      - "8000:8000"
+    restart: always
+    environment:
+      CONVERSION_SERVICE_PORT: 8000
+      ZIPKIN_SERVICE_NAME: zipkin
+      CURRENCY_EXCHANGE_HOST: currencyexchangerateservice
+    networks:
+      - currency-app-network
+    depends_on:
+      - zipkin
+      - currencyexchangerateservice
+volumes:
+  mysql-database-currency-volume:
+
+networks:
+  currency-app-network:
+    driver: bridge
+    attachable: true
+    

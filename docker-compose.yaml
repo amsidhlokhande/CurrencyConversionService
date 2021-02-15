@@ -1,0 +1,19 @@
+version: "3.7"
+services:
+  currencyconversionservice:
+    container_name: currencyconversionservice
+    image: adithilokhande/currencyconversionservice:0.0.1-SNAPSHOT
+    ports:
+      - "8000:8000"
+    restart: always
+    environment:
+      CONVERSION_SERVICE_PORT: 8000
+      ZIPKIN_SERVICE_NAME: zipkin
+      CURRENCY_EXCHANGE_HOST: currencyexchangerateservice
+    networks:
+      - currency-app-network
+
+networks:
+  currency-app-network:
+    driver: bridge
+    attachable: true
