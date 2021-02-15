@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: currencyconversionservice
+  name: currencyconversionservice
+spec:
+  minReadySeconds: 45
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: currencyconversionservice
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        io.kompose.network/currency-app-network: "true"
+        io.kompose.service: currencyconversionservice
+    spec:
+      containers:
+      - env:
+        - name: CONVERSION_SERVICE_PORT
+          value: "8000"
+        - name: CURRENCY_EXCHANGE_HOST
+          value: currencyexchangerateservice
+        - name: ZIPKIN_SERVICE_NAME
+          value: zipkin
+        image: adithilokhande/currencyconversionservice:0.0.1-SNAPSHOT
+        imagePullPolicy: Always
+        name: currencyconversionservice
+        ports:
+        - containerPort: 8000
+      restartPolicy: Always
