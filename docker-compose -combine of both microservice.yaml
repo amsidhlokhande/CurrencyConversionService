@@ -44,6 +44,7 @@ services:
       ZIPKIN_SERVICE_NAME: zipkin
     networks:
       - currency-app-network
+
   currencyconversionservice:
     container_name: currencyconversionservice
     image: adithilokhande/currencyconversionservice:0.0.1-SNAPSHOT
@@ -59,6 +60,7 @@ services:
     depends_on:
       - zipkin
       - currencyexchangerateservice
+
 volumes:
   mysql-database-currency-volume:
 

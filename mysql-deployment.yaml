@@ -4,6 +4,7 @@ metadata:
   labels:
     io.kompose.service: mysql
   name: mysql
+  namespace: default
 spec:
   minReadySeconds: 45
   replicas: 1
@@ -19,25 +20,77 @@ spec:
         io.kompose.service: mysql
     spec:
       containers:
-      - env:
-        - name: MYSQL_DATABASE
-          value: currenydb
-        - name: MYSQL_PASSWORD
-          value: currency
-        - name: MYSQL_ROOT_PASSWORD
-          value: root
-        - name: MYSQL_USER
-          value: currency
-        image: library/mysql:latest
-        imagePullPolicy: Always
-        name: mysql
-        ports:
-        - containerPort: 3306
-        volumeMounts:
-        - mountPath: /var/lib/mysql
-          name: mysql-database-currency-volume
+        - env:
+            - name: MYSQL_DATABASE
+              value: currenydb
+            - name: MYSQL_PASSWORD
+              value: currency
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+            - name: MYSQL_USER
+              value: currency
+          image: library/mysql:latest
+          imagePullPolicy: Always
+          name: mysql
+          ports:
+            - name: liveness-port
+              containerPort: 3306
+
+          readinessProbe:
+            failureThreshold: 5
+            periodSeconds: 10
+            initialDelaySeconds: 30
+            exec:
+              command: [ "mysqladmin", "ping", "-p$MYSQL_ROOT_PASSWORD" ]
+
+          livenessProbe:
+            failureThreshold: 5
+            periodSeconds: 10
+            initialDelaySeconds: 30
+            exec:
+              command: [ "mysqladmin", "ping", "-p$MYSQL_ROOT_PASSWORD" ]
+
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: 400m
+              memory: 1024Mi
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-database-currency-volume
+
       restartPolicy: Always
       volumes:
-      - name: mysql-database-currency-volume
-        persistentVolumeClaim:
-          claimName: mysql-database-currency-volume
+        - name: mysql-database-currency-volume
+          persistentVolumeClaim:
+            claimName: mysql-database-currency-volume
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: mysql
+  name: mysql
+spec:
+  type: LoadBalancer
+  ports:
+    - name: "3306"
+      port: 3306
+      targetPort: 3306
+  selector:
+    io.kompose.service: mysql
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: mysql-database-currency-volume
+  name: mysql-database-currency-volume
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi

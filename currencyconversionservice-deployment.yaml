@@ -4,6 +4,7 @@ metadata:
   labels:
     io.kompose.service: currencyconversionservice
   name: currencyconversionservice
+  namespace: default
 spec:
   minReadySeconds: 45
   replicas: 1
@@ -22,16 +23,58 @@ spec:
         io.kompose.service: currencyconversionservice
     spec:
       containers:
-      - env:
-        - name: CONVERSION_SERVICE_PORT
-          value: "8000"
-        - name: CURRENCY_EXCHANGE_HOST
-          value: currencyexchangerateservice
-        - name: ZIPKIN_SERVICE_NAME
-          value: zipkin
-        image: adithilokhande/currencyconversionservice:0.0.1-SNAPSHOT
-        imagePullPolicy: Always
-        name: currencyconversionservice
-        ports:
-        - containerPort: 8000
+        - env:
+            - name: CONVERSION_SERVICE_PORT
+              value: "8000"
+            - name: CURRENCY_EXCHANGE_HOST
+              value: currencyexchangerateservice
+            - name: ZIPKIN_SERVICE_NAME
+              value: zipkin
+          image: adithilokhande/currencyconversionservice:0.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          name: currencyconversionservice
+          ports:
+            - name: liveness-port
+              containerPort: 8000
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: 400m
+              memory: 1024Mi
+          livenessProbe:
+            httpGet:
+              port: liveness-port
+              path: /health
+            failureThreshold: 5
+            periodSeconds: 10
+            initialDelaySeconds: 60
+          readinessProbe:
+            httpGet:
+              port: liveness-port
+              path: /health
+            failureThreshold: 5
+            periodSeconds: 10
+            initialDelaySeconds: 60
       restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: currencyconversionservice
+  name: currencyconversionservice
+  namespace: default
+spec:
+  type: LoadBalancer
+  ports:
+    - name: "8000"
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+  selector:
+    io.kompose.service: currencyconversionservice
+  sessionAffinity: None
