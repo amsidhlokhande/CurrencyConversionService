@@ -22,7 +22,7 @@ spec:
       containers:
         - env:
             - name: MYSQL_DATABASE
-              value: currenydb
+              value: currencydb
             - name: MYSQL_PASSWORD
               value: currency
             - name: MYSQL_ROOT_PASSWORD

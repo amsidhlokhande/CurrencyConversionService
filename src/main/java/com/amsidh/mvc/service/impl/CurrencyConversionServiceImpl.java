@@ -26,7 +26,7 @@ public class CurrencyConversionServiceImpl implements CurrencyConversionService 
         currencyConversion.setCurrencyFrom(exchangeRate.getCurrencyFrom());
         currencyConversion.setCurrencyTo(exchangeRate.getCurrencyTo());
         currencyConversion.setQuantity(new BigDecimal(quantity));
-        currencyConversion.setValue(new BigDecimal(quantity * exchangeRate.getConversionMultiple().intValue()));
+        currencyConversion.setValue(new BigDecimal(quantity).multiply(exchangeRate.getConversionMultiple()));
         currencyConversion.setExchangeEnvironmentInfo(instanceInformationService.retrieveInstanceInfo());
         return currencyConversion;
     }

@@ -15,11 +15,11 @@ public class CurrencyConversionController {
 
     private final CurrencyConversionService currencyConversionService;
 
-
-    @GetMapping("/health")
-    public String healthCheck(){
-        return "Currency Conversion Service is up and running";
+    @GetMapping("/healthCheck")
+    public String healthCheck() {
+        return "Currency Exchange Rate Service is up and running";
     }
+
 
     @GetMapping("/currency-conversion/from/{fromCurrency}/to/{toCurrency}/value/{quantity}")
     public CurrencyConversion getCurrencyConversionValue(@PathVariable(value = "fromCurrency", required = true) String fromCurrency, @PathVariable(value = "toCurrency", required = true) String toCurrency, @PathVariable(value = "quantity", required = true) Integer quantity) {

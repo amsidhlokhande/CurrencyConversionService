@@ -34,7 +34,7 @@ spec:
           imagePullPolicy: Always
           name: currencyconversionservice
           ports:
-            - name: liveness-port
+            - name: health-port
               containerPort: 8000
           resources:
             requests:
@@ -45,15 +45,15 @@ spec:
               memory: 1024Mi
           livenessProbe:
             httpGet:
-              port: liveness-port
-              path: /health
+              port: health-port
+              path: /healthCheck
             failureThreshold: 5
             periodSeconds: 10
             initialDelaySeconds: 60
           readinessProbe:
             httpGet:
-              port: liveness-port
-              path: /health
+              port: health-port
+              path: /healthCheck
             failureThreshold: 5
             periodSeconds: 10
             initialDelaySeconds: 60
