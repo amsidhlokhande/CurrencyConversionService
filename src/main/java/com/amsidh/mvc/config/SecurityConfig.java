@@ -7,10 +7,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
-
-import java.util.Arrays;
-import java.util.Objects;
 
 @Configuration
 @EnableWebSecurity
@@ -22,17 +18,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
+        /*http.csrf().disable();
         http.headers().frameOptions().disable();
         http.authorizeRequests().antMatchers(getPermitAllUrls()).permitAll().anyRequest().authenticated()
                 .and().httpBasic()
                 .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);*/
+        http.authorizeRequests().anyRequest().permitAll().and().httpBasic().disable().csrf().disable();
     }
 
-    private String[] getPermitAllUrls() {
+    /*private String[] getPermitAllUrls() {
         String[] permitUrls = environment.getProperty("skip.spring.security.urls", String[].class);
         Arrays.asList(Objects.requireNonNull(permitUrls)).forEach(prop -> log.info(prop));
         return permitUrls;
-    }
+    }*/
 }
