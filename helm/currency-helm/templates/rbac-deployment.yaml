@@ -1,0 +1,14 @@
+#This will help to call external webservice using @FeignClient(name = "currency-exchange-service") //Kubernetes Service Name
+#@RibbonClient(name = "currency-exchange-service")
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: rabc
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view

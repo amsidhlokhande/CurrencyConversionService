@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Values.ingress.name}}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /{{ .Values.deployment.currency.exchange.app.name}}/*
+        backend:
+          serviceName: {{ .Values.deployment.currency.exchange.service.name}}
+          servicePort: {{ .Values.deployment.currency.exchange.app.port}}
+      - path: /{{ .Values.deployment.currency.conversion.app.name}}/*
+        backend:
+          serviceName: {{ .Values.deployment.currency.conversion.service.name}}
+          servicePort: {{ .Values.deployment.currency.conversion.app.port}}
+

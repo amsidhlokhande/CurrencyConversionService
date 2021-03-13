@@ -1,0 +1,26 @@
+deployment:
+  currency:
+    exchange:
+      app:
+        name: currency-exchange
+        image: adithilokhande/currency-exchange:0.0.1-SNAPSHOT
+        port: 8000
+        replicas: 2
+      service:
+        servicetype: NodePort
+        name: currency-exchange-service
+
+    conversion:
+      app:
+        name: currency-conversion
+        image: adithilokhande/currency-conversion:0.0.1-SNAPSHOT
+        port: 8100
+        replicas: 2
+      service:
+        servicetype: NodePort
+        name: currency-conversion-service
+
+ingress:
+  annotation: [nginx.ingress.kubernetes.io/rewrite-target: /]
+  name: gateway-ingress
+
